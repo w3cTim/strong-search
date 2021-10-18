@@ -40,6 +40,7 @@
 //   setup() {},
 // });
 import { ref } from "vue";
+import { getStorageLocal, setStorageLocal } from "src/utils/index.js";
 
 const columns = [
   { name: "id", label: "", field: "id" },
@@ -70,7 +71,9 @@ export default {
       rows,
       pagination,
       seva() {
-        console.log(rows);
+        try {
+          setStorageLocal({ StrongData: rows });
+        } catch (error) {}
       },
     };
   },

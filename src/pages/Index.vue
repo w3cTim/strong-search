@@ -1,12 +1,13 @@
 <template>
   <div class="q-pa-md">
-    <q-table :rows="rows" row-key="name" :columns="columns" title="引擎管理" v-model:pagination="pagination" hide-pagination>
+    <q-table :rows="rows" row-key="name" :columns="columns" :loading="loading" title="引擎管理" v-model:pagination="pagination" hide-pagination>
       <template v-slot:buttom>
         <q-btn color="primary" :disable="loading" label="Add row" @click="addRow" />
         <q-btn class="q-ml-sm" color="primary" :disable="loading" label="Remove row" @click="removeRow" />
       </template>
       <template v-slot:body="props">
         <q-tr :props="props">
+          <q-td key="id" style="width: 100px"> {{ props.row.id }} {{ props.row.index }} </q-td>
           <q-td key="group">
             {{ props.row.group }}
             <q-popup-edit v-model="props.row.group" title="编辑分组" buttons label-set="确认" label-cancel="取消" v-slot="scope">
@@ -26,19 +27,14 @@
             </q-popup-edit>
           </q-td>
           <q-td key="enable" style="width: 100px">
-            <q-toggle v-model="props.row.enable" checked-icon="check_circle_outline" unchecked-icon="highlight_off" color="secondary"/>
-                <q-tooltip
-                  transition-show="scale"
-                  transition-hide="scale"
-                >
-                  Here I am!
-                </q-tooltip>
+            <q-toggle v-model="props.row.enable" checked-icon="check_circle_outline" unchecked-icon="highlight_off" color="secondary" />
           </q-td>
           <q-td key="encode" style="width: 100px">
-            <q-toggle v-model="props.row.encode" checked-icon="code" unchecked-icon="code_off" color="secondary" />
+            <q-tooltip anchor="top middle" transition-show="scale" transition-hide="scale"> 如果遇到搜索引擎字符乱码，请选中"编码"选项。 </q-tooltip>
+            <q-toggle v-model="props.row.encode" checked-icon="code" unchecked-icon="code_off" color="secondary"> </q-toggle>
           </q-td>
           <q-td key="id" style="width: 100px">
-            <q-btn flat round color="accent" icon="delete_forever" />
+            <q-btn flat round color="accent" icon="delete_forever" @click="removeRow(props.row.id)" />
           </q-td>
         </q-tr>
       </template>
@@ -49,18 +45,20 @@
     <!-- <q-separator class="q-my-lg" /> -->
 
     <q-footer bordered class="bg-white q-pa-md row justify-end">
-      <q-btn color="primary" label="保  存" @click="addRow" />
-      <q-btn class="q-ml-md" color="accent" label="还原默认" @click="addRow" />
+      <q-btn color="primary" label="保  存" @click="save" />
+      <q-btn class="q-ml-md" color="accent" label="还原默认" @click="reset" />
     </q-footer>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
-import { setStorageLocal } from "src/utils/index.js";
+import { ref, reactive, toRaw, onBeforeUnmount } from "vue";
+import { useQuasar, uid, copyToClipboard } from "quasar";
+
+import { setStorageLocal, getStorageLocal } from "src/utils/index.js";
 
 const columns = [
-  // { name: "id", label: "", field: "id" },
+  { name: "id", label: "", field: "id" },
   { name: "group", align: "left", label: "分组名称", field: "group" },
   { name: "name", align: "left", label: "名称", field: "name" },
   { name: "url", align: "left", label: "URL", field: "url" },
@@ -69,7 +67,7 @@ const columns = [
   { name: "c", label: "操作", field: "id", align: "left" },
 ];
 
-const rows = [
+const originalRows = [
   { id: 101, group: "默认", name: "google", url: "https://www.google.com.tw/search?q=%s", encode: false, enable: true },
   { id: 102, group: "默认", name: "百度", url: "https://www.baidu.com/search?q=%s", encode: false, enable: true },
   { id: 103, group: "默认", name: "wiki", url: "https://zh.wikipedia.org/wiki/%s", encode: false, enable: true },
@@ -78,20 +76,40 @@ const rows = [
   { id: 301, group: "购物", name: "值得买", url: "http://search.smzdm.com/?s=%s", encode: false, enable: true },
   { id: 302, group: "购物", name: "狗东", url: "https://search.jd.com/Search?keyword=%s", encode: false, enable: true },
   { id: 303, group: "购物", name: "亚马逊", url: "http://www.amazon.cn/keywords=%s", encode: false, enable: true },
-  { id: 301, group: "购物", name: "值得买", url: "http://search.smzdm.com/?s=%s", encode: false, enable: true },
-  { id: 302, group: "购物", name: "狗东", url: "https://search.jd.com/Search?keyword=%s", encode: false, enable: true },
-  { id: 303, group: "购物", name: "亚马逊", url: "http://www.amazon.cn/keywords=%s", encode: false, enable: true },
-  { id: 301, group: "购物", name: "值得买", url: "http://search.smzdm.com/?s=%s", encode: false, enable: true },
-  { id: 302, group: "购物", name: "狗东", url: "https://search.jd.com/Search?keyword=%s", encode: false, enable: true },
-  { id: 303, group: "购物", name: "亚马逊", url: "http://www.amazon.cn/keywords=%s", encode: false, enable: true },
 ];
 
 export default {
-  setup() {
+  async setup() {
+    const $q = useQuasar();
+
+    // Our function which receives the URL sent by the background script.
+    function doOnTabOpened(url) {
+      console.log("New Browser Tab Openend: ", url);
+      copyToClipboard("some text")
+        .then(() => {
+          // success!
+        })
+        .catch(() => {
+          // fail
+        });
+    }
+
+    // Add our listener
+    $q.bex.on("bex.tab.opened", doOnTabOpened);
+
+    // Don't forget to clean it up
+    onBeforeUnmount(() => {
+      $q.bex.off("bex.tab.opened", doOnTabOpened);
+    });
+
     const pagination = ref({ page: 1, rowsPerPage: 999 });
     const loading = ref(false);
     const errorState = ref(false);
     const errorMessage = ref("");
+
+    let data = await getStorageLocal("StrongData");
+
+    let rows = Object.keys(data).length === 0 ? reactive(originalRows) : reactive(data.StrongData);
 
     return {
       pagination,
@@ -101,34 +119,38 @@ export default {
       errorMessage,
 
       columns,
-      rows: ref(rows),
+      rows,
 
       addRow() {
-        loading.value = true;
-        setTimeout(() => {
-          const index = Math.floor(Math.random() * (rows.value.length + 1)),
-            row = originalRows[Math.floor(Math.random() * originalRows.length)];
-
-          if (rows.value.length === 0) {
-            rowCount.value = 0;
-          }
-
-          row.id = ++rowCount.value;
-          const newRow = { ...row }; // extend({}, row, { name: `${row.name} (${row.__count})` })
-          rows.value = [...rows.value.slice(0, index), newRow, ...rows.value.slice(index)];
-          loading.value = false;
-        }, 500);
+        const newRow = { id: "", group: "默认", name: "Name", url: "https://www.google.com/search?q=%s", encode: false, enable: true };
+        newRow.id = uid();
+        rows.push(newRow);
       },
-      removeRow() {
-        loading.value = true;
-        setTimeout(() => {
-          const index = Math.floor(Math.random() * rows.value.length);
-          rows.value = [...rows.value.slice(0, index), ...rows.value.slice(index + 1)];
-          loading.value = false;
-        }, 500);
+      removeRow(id) {
+        const index = rows.findIndex((n) => n.id === id);
+        rows.splice(index, 1);
       },
       save() {
-        setStorageLocal({ rows });
+        $q.notify({
+          message: "保存成功",
+          icon: "cloud_done",
+          color: "secondary",
+        });
+        setStorageLocal({ StrongData: toRaw(rows) });
+      },
+      reset() {
+        $q.dialog({
+          title: "提示",
+          icon: "network_wifi",
+          message: "确认还原默认配置？",
+          cancel: true,
+          ok: "确认",
+          cancel: "取消",
+        }).onOk(() => {
+          rows.length = 0;
+          rows.push(...originalRows);
+          setStorageLocal({ StrongData: originalRows });
+        });
       },
 
       nameValidation(val) {

@@ -19,7 +19,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <suspense>
+        <router-view />
+      </suspense>
     </q-page-container>
   </q-layout>
 </template>
@@ -32,7 +34,7 @@ const linksList = [
     title: "引擎增改",
     caption: "添加、修改、删除搜索引擎",
     icon: "format_align_left",
-    link: "#/options",
+    link: "#/",
   },
   {
     title: "引擎排序",

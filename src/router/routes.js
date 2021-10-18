@@ -4,10 +4,14 @@ const routes = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: 'options', component: () => import('pages/Index.vue') },
+      { path: '/', component: () => import('pages/Index.vue') },
       { path: 'sort', component: () => import('pages/Sort.vue') },
       { path: 'about', component: () => import('pages/Index.vue') }
     ]
+  },
+  {
+    path: '/createmenu',
+    component: () => import('pages/StrongMenu.vue')
   },
 
   // Always leave this as last one,

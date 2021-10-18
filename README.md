@@ -1,6 +1,4 @@
-# strong-search (strong-search)
-
-彪悍搜索
+# 强悍搜索 (strong-search)
 
 ## Install the dependencies
 ```bash

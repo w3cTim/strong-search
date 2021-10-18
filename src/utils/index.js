@@ -1,11 +1,4 @@
-/*
- * @Author: your name
- * @Date: 2021-10-13 09:33:42
- * @LastEditTime: 2021-10-13 09:57:36
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /strong-search/src/utils/index.js
- */
+
 export const setStorageLocal = async (items) => {
   let result = await new Promise((resolve) => {
     chrome.storage.local.set(items, () => {

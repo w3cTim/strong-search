@@ -8,15 +8,12 @@
     "48": "icons/icon-48x48.png",
     "128": "icons/icon-128x128.png"
   },
-  "options_page": "www/index.html#/options",
+  "options_page": "www/index.html#/",
   "browser_action": {
     "default_title": "强悍搜索"
   },
   "background": {
-    "scripts": [
-      "www/bex-background.js",
-      "js/background.js"
-    ],
+    "page": "background.html",
     "persistent": true
   },
   "content_scripts": [{
