@@ -145,8 +145,8 @@ module.exports = configure(function (ctx) {
       },
 
       manifest: {
-        name: `strong-search`,
-        short_name: `strong-search`,
+        name: `Strong Search`,
+        short_name: `Strong Search`,
         description: `强悍搜索`,
         display: 'standalone',
         orientation: 'portrait',
@@ -212,7 +212,7 @@ module.exports = configure(function (ctx) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'strong-search'
+        appId: 'Strong Search'
       },
 
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain

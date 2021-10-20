@@ -1,8 +1,8 @@
 {
-  "name": "strong-search",
+  "name": "Strong Search",
   "version": "0.0.1",
   "description": "彪悍搜索",
-  "productName": "strong-search",
+  "productName": "Strong Search",
   "author": "Timon <luo.tian@live.cn>",
   "private": true,
   "scripts": {

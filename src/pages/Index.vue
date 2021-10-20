@@ -1,13 +1,19 @@
 <template>
   <div class="q-pa-md">
-    <q-table :rows="rows" row-key="name" :columns="columns" :loading="loading" title="引擎管理" v-model:pagination="pagination" hide-pagination>
-      <template v-slot:buttom>
-        <q-btn color="primary" :disable="loading" label="Add row" @click="addRow" />
-        <q-btn class="q-ml-sm" color="primary" :disable="loading" label="Remove row" @click="removeRow" />
+    <div class="q-gutter-sm">
+      <q-checkbox v-model="options.triggerkey" label="需要同时按下 Ctrl 键触发" />
+    </div>
+    <q-separator class="q-my-lg" />
+    <q-table :rows="options.engines" :filter="filter" row-key="id" :columns="columns" :loading="loading" title="引擎管理" v-model:pagination="pagination" hide-pagination>
+      <template v-slot:top-right>
+        <q-input borderless dense debounce="300" v-model="filter" placeholder="搜索">
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
       </template>
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td key="id" style="width: 100px"> {{ props.row.id }} {{ props.row.index }} </q-td>
           <q-td key="group">
             {{ props.row.group }}
             <q-popup-edit v-model="props.row.group" title="编辑分组" buttons label-set="确认" label-cancel="取消" v-slot="scope">
@@ -29,6 +35,9 @@
           <q-td key="enable" style="width: 100px">
             <q-toggle v-model="props.row.enable" checked-icon="check_circle_outline" unchecked-icon="highlight_off" color="secondary" />
           </q-td>
+          <q-td key="isnew" style="width: 100px">
+            <q-toggle v-model="props.row.isnew" checked-icon="tab" unchecked-icon="tab_unselected" color="secondary" />
+          </q-td>
           <q-td key="encode" style="width: 100px">
             <q-tooltip anchor="top middle" transition-show="scale" transition-hide="scale"> 如果遇到搜索引擎字符乱码，请选中"编码"选项。 </q-tooltip>
             <q-toggle v-model="props.row.encode" checked-icon="code" unchecked-icon="code_off" color="secondary"> </q-toggle>
@@ -43,92 +52,95 @@
       <q-btn class="q-mt-md" color="secondary" label="添加引擎" @click="addRow" />
     </div>
     <!-- <q-separator class="q-my-lg" /> -->
+    <q-dialog v-model="inprotDialog" persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">请选择配置文件</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-file color="grey-3" label="选择文件" outlined v-model="inportFile" accept=".json" @input="inprotButtom = false">
+            <template v-slot:append>
+              <q-icon name="attachment" />
+            </template>
+          </q-file>
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="确认导入" @click="submitInport" :disable="inprotButtom" v-close-popup />
+          <q-btn flat label="取消" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
     <q-footer bordered class="bg-white q-pa-md row justify-end">
       <q-btn color="primary" label="保  存" @click="save" />
       <q-btn class="q-ml-md" color="accent" label="还原默认" @click="reset" />
+      <q-btn class="q-ml-md" color="secondary" label="导出配置" @click="exportConfig" />
+      <q-btn class="q-ml-md" color="secondary" label="导入配置" @click="inprotDialog = true" />
     </q-footer>
   </div>
 </template>
 
 <script>
-import { ref, reactive, toRaw, onBeforeUnmount } from "vue";
-import { useQuasar, uid, copyToClipboard } from "quasar";
+import { ref, reactive, toRaw, nextTick } from "vue";
+import { useQuasar, uid } from "quasar";
 
-import { setStorageLocal, getStorageLocal } from "src/utils/index.js";
+import { setStorageSync, getStorageSync, resetStorageSync, downloadJson, parseJsonFile } from "src/utils/index.js";
 
 const columns = [
-  { name: "id", label: "", field: "id" },
   { name: "group", align: "left", label: "分组名称", field: "group" },
   { name: "name", align: "left", label: "名称", field: "name" },
   { name: "url", align: "left", label: "URL", field: "url" },
   { name: "enable", align: "left", label: "是否启用", field: "enable" },
+  { name: "isnew", align: "left", label: "新页面打开", field: "isnew" },
   { name: "encode", align: "left", label: "是否编码", field: "encode" },
   { name: "c", label: "操作", field: "id", align: "left" },
-];
-
-const originalRows = [
-  { id: 101, group: "默认", name: "google", url: "https://www.google.com.tw/search?q=%s", encode: false, enable: true },
-  { id: 102, group: "默认", name: "百度", url: "https://www.baidu.com/search?q=%s", encode: false, enable: true },
-  { id: 103, group: "默认", name: "wiki", url: "https://zh.wikipedia.org/wiki/%s", encode: false, enable: true },
-  { id: 1032, group: "搜索", name: "必应", url: "http://www.bing.com/search?q=%s", encode: false, enable: true },
-  { id: 10322, group: "搜索", name: "magi", url: "https://magi.com/search?q=%s", encode: false, enable: true },
-  { id: 301, group: "购物", name: "值得买", url: "http://search.smzdm.com/?s=%s", encode: false, enable: true },
-  { id: 302, group: "购物", name: "狗东", url: "https://search.jd.com/Search?keyword=%s", encode: false, enable: true },
-  { id: 303, group: "购物", name: "亚马逊", url: "http://www.amazon.cn/keywords=%s", encode: false, enable: true },
 ];
 
 export default {
   async setup() {
     const $q = useQuasar();
-
-    // Our function which receives the URL sent by the background script.
-    function doOnTabOpened(url) {
-      console.log("New Browser Tab Openend: ", url);
-      copyToClipboard("some text")
-        .then(() => {
-          // success!
-        })
-        .catch(() => {
-          // fail
-        });
-    }
-
-    // Add our listener
-    $q.bex.on("bex.tab.opened", doOnTabOpened);
-
-    // Don't forget to clean it up
-    onBeforeUnmount(() => {
-      $q.bex.off("bex.tab.opened", doOnTabOpened);
-    });
-
     const pagination = ref({ page: 1, rowsPerPage: 999 });
     const loading = ref(false);
+
     const errorState = ref(false);
     const errorMessage = ref("");
 
-    let data = await getStorageLocal("StrongData");
+    const inprotDialog = ref(false);
+    const inprotButtom = ref(true);
+    const inportFile = ref(null);
 
-    let rows = Object.keys(data).length === 0 ? reactive(originalRows) : reactive(data.StrongData);
+    let data = await getStorageSync();
+
+    let options = reactive(data);
 
     return {
       pagination,
       loading,
+      columns,
+      options,
+      filter: ref(""),
 
       errorState,
       errorMessage,
 
-      columns,
-      rows,
+      inprotDialog,
+      inportFile,
+      inprotButtom,
 
       addRow() {
-        const newRow = { id: "", group: "默认", name: "Name", url: "https://www.google.com/search?q=%s", encode: false, enable: true };
+        const newRow = { id: "", group: "常用", name: "Name", url: "https://www.google.com/search?q=%s", encode: false, isnew: true, enable: true };
         newRow.id = uid();
-        rows.push(newRow);
+        options.engines.push(newRow);
+
+        nextTick(() => {
+          scrollTo(0, document.documentElement.scrollTop + 60);
+        });
       },
       removeRow(id) {
-        const index = rows.findIndex((n) => n.id === id);
-        rows.splice(index, 1);
+        const index = options.engines.findIndex((n) => n.id === id);
+        options.engines.splice(index, 1);
       },
       save() {
         $q.notify({
@@ -136,7 +148,7 @@ export default {
           icon: "cloud_done",
           color: "secondary",
         });
-        setStorageLocal({ StrongData: toRaw(rows) });
+        setStorageSync(toRaw(options));
       },
       reset() {
         $q.dialog({
@@ -146,13 +158,73 @@ export default {
           cancel: true,
           ok: "确认",
           cancel: "取消",
-        }).onOk(() => {
-          rows.length = 0;
-          rows.push(...originalRows);
-          setStorageLocal({ StrongData: originalRows });
+        }).onOk(async () => {
+          const reset = await resetStorageSync();
+          Object.assign(options, reset);
         });
       },
+      exportConfig() {
+        downloadJson(JSON.stringify(options), "强悍搜索配置.json");
+      },
+      async submitInport() {
+        const showMessage = (msg) => {
+          $q.notify({
+            type: "warning",
+            message: msg,
+            timeout: 4000,
+          });
+        };
 
+        let inportJSON = null;
+        try {
+          inportJSON = await parseJsonFile(inportFile.value);
+        } catch (error) {
+          $q.notify({
+            type: "negative",
+            message: "导入文件数据格式错误，请检查导入文件。",
+            timeout: 4000,
+          });
+          return;
+        }
+
+        inportFile.value = null;
+
+        if (inportJSON === null) {
+          showMessage("请导入正确的数据。");
+          return;
+        }
+        const keyCloumn = ["triggerkey", "engines"];
+        const inportKey = Object.keys(inportJSON);
+
+        if (inportKey.length === 0) {
+          showMessage("请导入正确的数据。");
+          return;
+        }
+
+        while (keyCloumn.length) {
+          let key = keyCloumn.shift();
+          if (!inportKey.includes(key)) {
+            showMessage(`文件缺少关键字：${key} ,请检查导入文件。`);
+            return;
+          }
+        }
+        const engines = inportJSON["engines"];
+        console.log(engines);
+        if (engines === null || !Array.isArray(engines) || engines.length === 0) {
+          showMessage("导入数据行不能为空，请检查导入文件。");
+          return;
+        }
+
+        Object.assign(options, inportJSON);
+
+        $q.notify({
+          message: "成功导入数据~",
+          icon: "cloud_done",
+          color: "secondary",
+        });
+
+        setStorageSync(toRaw(options));
+      },
       nameValidation(val) {
         if (val !== undefined && val.length === 0) {
           errorState.value = true;

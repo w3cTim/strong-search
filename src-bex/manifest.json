@@ -1,6 +1,6 @@
 {
   "name": "强悍搜索",
-  "description": "一个使用自然、可自定义的多引擎搜索扩展",
+  "description": "一个人性化、可自定义的多引擎搜索扩展",
   "version": "1.0.0",
   "manifest_version": 2,
   "icons": {

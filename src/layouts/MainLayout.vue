@@ -34,19 +34,19 @@ const linksList = [
     title: "引擎增改",
     caption: "添加、修改、删除搜索引擎",
     icon: "format_align_left",
-    link: "#/",
+    link: "/options",
   },
   {
     title: "引擎排序",
     caption: "更改搜索引擎排列",
     icon: "format_line_spacing",
-    link: "#/sort",
+    link: "/sort",
   },
   {
     title: "关于",
     caption: "使用说明",
     icon: "face",
-    link: "#/about",
+    link: "/about",
   },
 ];
 
