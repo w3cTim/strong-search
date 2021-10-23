@@ -13,7 +13,10 @@
     "default_title": "强悍搜索"
   },
   "background": {
-    "page": "background.html",
+    "scripts": [
+      "www/bex-background.js",
+      "js/background.js"
+    ],
     "persistent": true
   },
   "content_scripts": [{
@@ -28,9 +31,7 @@
   }],
   "permissions": [
     "<all_urls>",
-    "storage",
-    "tabs",
-    "activeTab"
+    "storage"
   ],
   "web_accessible_resources": [
     "www/*",
@@ -38,6 +39,7 @@
     "css/*",
     "<all_urls>"
   ],
-  "homepage_url": "http://didi.w3ctim.com/",
+  "homepage_url": "https://w3ctim.com/strongsearch",
+  "default_locale": "zh_CN",
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';"
 }

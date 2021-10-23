@@ -165,13 +165,12 @@
 
 <script>
 import { defineComponent, ref } from "vue";
-import { useQuasar, copyToClipboard } from "quasar";
 
 export default defineComponent({
-  name: "specification",
+  name: "about",
   setup() {
     return {
-      tab: ref("about"),
+      tab: ref("specification"),
       innerTab: ref("innerCU"),
       splitterModel: ref(10),
     };

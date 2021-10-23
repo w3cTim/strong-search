@@ -1,9 +1,9 @@
 {
-  "name": "Strong Search",
+  "name": "strong-search",
   "version": "0.0.1",
-  "description": "彪悍搜索",
+  "description": "彪悍搜索 一个人性化、快速选择文字多引擎搜索工具",
   "productName": "Strong Search",
-  "author": "Timon <luo.tian@live.cn>",
+  "author": "w3cTim <luo.tian@live.cn>",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",

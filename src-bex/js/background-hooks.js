@@ -3,8 +3,6 @@
 
 // More info: https://quasar.dev/quasar-cli/developing-browser-extensions/background-hooks
 
-
-
 export default function attachBackgroundHooks(bridge /* , allActiveConnections */) {
   bridge.on('storage.get', event => {
     const payload = event.data
@@ -38,12 +36,6 @@ export default function attachBackgroundHooks(bridge /* , allActiveConnections *
       bridge.send(event.eventResponseKey, payload.data)
     })
   })
-
-  // chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  //   if (request.cmd = "copytext") {
-  //     bridge.send('bex.strongsearch.copytext', { text: request.text })
-  //   }
-  // })
 
   /*
   // EXAMPLES

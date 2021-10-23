@@ -131,7 +131,7 @@ document.addEventListener("keyup", function (e) {
 document.addEventListener("mouseup", function (e) {
   const searchMenu = document.getElementById(searchMenuId);
 
-  // 有菜单左键打开页面，中间停留当前再打开其他页面；无菜单创建
+  // 有菜单左键打开页面，中间停留当前页面，后台打开新页面；无菜单创建
   // 其他键按下时如果有菜单，则删除菜单
   if (e.button !== 0) {
     if (searchMenu && e.button !== 1) {

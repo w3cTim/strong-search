@@ -209,7 +209,6 @@ export default {
           }
         }
         const engines = inportJSON["engines"];
-        console.log(engines);
         if (engines === null || !Array.isArray(engines) || engines.length === 0) {
           showMessage("导入数据行不能为空，请检查导入文件。");
           return;
