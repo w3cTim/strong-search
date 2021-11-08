@@ -58,13 +58,13 @@ quasar build
 
 See [Configuring quasar.conf.js](https://v2.quasar.dev/quasar-cli/quasar-conf-js).
 
-### quasar v2.0.0 遇到的 bug
+### Quasar BEX v2.0.0 遇到的 bug
 
 1. 编译后 index.html 为拷贝到 www 目录，需手动移动到 www 目录，也可以参考下面解决方案
 
     [https://stackoverflow.com/questions/68606159/how-to-solve-error-firefox-can-t-find-the-file-at-moz-extension-when](https://stackoverflow.com/questions/68606159/how-to-solve-error-firefox-can-t-find-the-file-at-moz-extension-when)
 
-2. 浏览器插件的 manifest.json 文件规定 `background` 参数值必须 `page` 或 `scripts`；但 quasar bex 不支持 `page`，必须使用 `scripts`，因为 quasar bex 还需要编译 `background` 指定的 `scripts`; 如果想使用 `page`，编译后再手动配置。
+2. 浏览器插件的 manifest.json 文件规定 `background` 参数值必须 `page` 或 `scripts`；但 Quasar BEX 不支持 `page`，必须使用 `scripts`，因为还需要编译 `background` 指定的 `scripts`; 如果想使用 `page`，编译后再手动配置。
 
    ```js
    "background": {
