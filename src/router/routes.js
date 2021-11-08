@@ -9,10 +9,10 @@ const routes = [
       { path: 'about', component: () => import('pages/About.vue') }
     ]
   },
-  {
-    path: '/createmenu',
-    component: () => import('src/pages/About.vue')
-  },
+  // {
+  //   path: '/createmenu',
+  //   component: () => import('src/pages/About.vue')
+  // },
 
   // Always leave this as last one,
   // but you can also remove it

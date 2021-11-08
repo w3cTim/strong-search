@@ -31,15 +31,12 @@ function createSearchMenu(options, x, y) {
     position: "absolute",
     left: x + "px",
     top: (y + menuOffset) + "px",
-    zIndex: 999999,
+    zIndex: 2147483647,
   })
 
   document.body.appendChild(searchMenu);
 
   const redirect = selectionText.match(/(\w+:\/\/[^/:]+)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?/g);
-
-
-
 
   if (redirect != null) {
     const newOpen = document.createElement("a");
@@ -51,7 +48,6 @@ function createSearchMenu(options, x, y) {
     // 点击菜单项后关闭菜单
     searchMenu.appendChild(newOpen);
   }
-
 
   // 根据配置新建子菜单项
   for (let i = 0; i < options.engines.length; i++) {
@@ -161,6 +157,5 @@ document.addEventListener("mouseup", function (e) {
   chrome.runtime.sendMessage({ cmd: 'get_options' }, function (opts) {
     createSearchMenu(opts, x, y);
   });
-
 
 }, false);

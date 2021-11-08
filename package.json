@@ -1,7 +1,7 @@
 {
   "name": "strong-search",
-  "version": "0.0.1",
-  "description": "彪悍搜索 一个人性化、快速选择文字多引擎搜索工具",
+  "version": "1.0.0",
+  "description": "强悍搜索 一个人性化、快速选择文字多引擎搜索工具",
   "productName": "Strong Search",
   "author": "w3cTim <luo.tian@live.cn>",
   "private": true,

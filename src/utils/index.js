@@ -54,14 +54,13 @@ export const downloadJson = (content, filename) => {
   // 创建隐藏的可下载链接
   let eleLink = document.createElement("a");
   eleLink.download = filename;
-  eleLink.style.display = "none"; // 字符内容转变成blob地址
+  eleLink.style.display = "none";
 
   let blob = new Blob([content]);
-  eleLink.href = URL.createObjectURL(blob); // 触发点击
-
+  // 字符内容转变成 blob 地址
+  eleLink.href = URL.createObjectURL(blob);
   document.body.appendChild(eleLink);
-  eleLink.click(); // 然后移除
-
+  eleLink.click();
   document.body.removeChild(eleLink);
 };
 
