@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/niudai/VSCode-Zhihu">🚀 使您的网页搜索效率提高300% ⚡️</a>
+<a href="//w3ctim.com/strongsearch/">🚀 使您的网页搜索效率提高300% ⚡️</a>
 </p>
 
 # 强悍搜索 (Strong Search)
