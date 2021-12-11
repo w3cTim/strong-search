@@ -23,6 +23,8 @@ function createSearchMenu(options, x, y) {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
+
   // 创建菜单div
   const searchMenu = document.createElement("div");
   searchMenu.id = searchMenuId;
@@ -34,7 +36,7 @@ function createSearchMenu(options, x, y) {
     zIndex: 2147483647,
   })
 
-  document.body.appendChild(searchMenu);
+  fragment.appendChild(searchMenu);
 
   const redirect = selectionText.match(/(\w+:\/\/[^/:]+)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?/g);
 
@@ -60,8 +62,8 @@ function createSearchMenu(options, x, y) {
     }
 
     // 如果分组菜单不存在，则新建一个
-    const ulID = `strong_search_menu_${group}`
-    let ulMenu = document.getElementById(ulID);
+    const ulID = `strong_search_menu_${group}1`
+    let ulMenu = fragment.getElementById(ulID);
     if (ulMenu === null) {
       ulMenu = document.createElement("ul");
       ulMenu.id = ulID;
@@ -103,6 +105,8 @@ function createSearchMenu(options, x, y) {
   }, true);
 
   searchMenu.appendChild(copyNode);
+
+  document.body.appendChild(fragment);
 }
 
 // 检查 ctrl 是否按下

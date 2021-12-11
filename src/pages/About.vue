@@ -80,6 +80,17 @@
 
                   <q-item-section side top>博客 </q-item-section>
                 </q-item>
+                <q-item clickable v-ripple tag="a" href="https://github.com/w3cTim/strong-search" target="_block">
+                  <q-item-section avatar>
+                    <q-avatar>
+                      <img src="https://github.githubassets.com/favicons/favicon.svg" />
+                    </q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label lines="1">GitHub</q-item-label>
+                  </q-item-section>
+                  <q-item-section side top> 源码 </q-item-section>
+                </q-item>
 
                 <q-item clickable v-ripple tag="a" href="mailto:luo.tian@live.cn" target="_block">
                   <q-item-section avatar>
