@@ -60,7 +60,7 @@ See [Configuring quasar.conf.js](https://v2.quasar.dev/quasar-cli/quasar-conf-js
 
 ### Quasar BEX v2.0.0 遇到的 bug
 
-1. 编译后 index.html 为拷贝到 www 目录，需手动移动到 www 目录，也可以参考下面解决方案
+1. 编译后 index.html 未拷贝到 www 目录，需手动移动到 www 目录，也可以参考下面解决方案
 
     [https://stackoverflow.com/questions/68606159/how-to-solve-error-firefox-can-t-find-the-file-at-moz-extension-when](https://stackoverflow.com/questions/68606159/how-to-solve-error-firefox-can-t-find-the-file-at-moz-extension-when)
 
